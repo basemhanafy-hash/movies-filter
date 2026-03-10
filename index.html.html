@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فلتر الأفلام العائلي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f1e;--surface:#111827;--card:#1a2235;--border:#2a3550;--accent:#f59e0b;--accent2:#10b981;--danger:#ef4444;--warn:#f97316;--text:#e2e8f0;--muted:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Cairo,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:linear-gradient(135deg,#0f172a,#1e1b4b,#0f172a);border-bottom:1px solid var(--border);padding:20px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.header h1{font-size:22px;font-weight:900;color:var(--accent)}.header p{font-size:12px;color:var(--muted);margin-top:2px}
+.badge{margin-right:auto;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center;font-size:12px;color:var(--muted)}
+.badge strong{display:block;font-size:20px;color:var(--accent);font-weight:900}
+.main{max-width:860px;margin:0 auto;padding:24px 16px}
+.setup{background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:28px;margin-bottom:20px}
+.setup h2{font-size:18px;font-weight:900;color:var(--accent);margin-bottom:8px}
+.setup p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.progress-wrap{background:var(--surface);border-radius:10px;height:12px;overflow:hidden;margin-bottom:8px}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#10b981);border-radius:10px;transition:width .3s;width:0%}
+.progress-text{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px}
+.log{background:var(--surface);border-radius:8px;padding:12px;height:130px;overflow-y:auto;font-size:12px;font-family:monospace;direction:ltr}
+.log div{padding:2px 0;border-bottom:1px solid var(--border)}
+.lok{color:#34d399}.lwarn{color:#fb923c}.lbad{color:#f87171}
+.app{display:none}
+.sbox{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px}
+.sbox:focus-within{border-color:var(--accent)}
+.slabel{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+.srow{display:flex;gap:10px;position:relative}
+.sinp{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 15px;color:var(--text);font-family:Cairo,sans-serif;font-size:15px;direction:rtl}
+.sinp:focus{outline:none;border-color:var(--accent)}.sinp::placeholder{color:var(--muted)}
+.btn{background:var(--accent);color:#000;border:none;border-radius:10px;padding:11px 20px;font-family:Cairo,sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s}
+.btn:hover{background:#d97706}.btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
+.btn.sec{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn.sec:hover{background:var(--card)}
+.hint{font-size:12px;color:var(--muted);margin-top:8px}
+.sugg{background:var(--surface);border:1px solid var(--border);border-radius:10px;position:absolute;top:100%;right:0;left:0;z-index:10;max-height:200px;overflow-y:auto;display:none;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.sugg.show{display:block}
+.si{padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--border)}
+.si:hover{background:var(--card)}.si:last-child{border-bottom:none}
+.rcard{background:var(--card);border-radius:14px;padding:22px;margin-bottom:16px;border:2px solid var(--border);animation:fin .3s ease}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.rheader{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+.rico{font-size:34px;flex-shrink:0}
+.rtitle{font-size:18px;font-weight:700}
+.rbadge{margin-right:auto;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;flex-shrink:0}
+.rs{background:#064e3b;color:#34d399;border:1px solid #065f46}
+.rc{background:#431407;color:#fb923c;border:1px solid #7c2d12}
+.ra{background:#450a0a;color:#f87171;border:1px solid #7f1d1d}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.cat{background:var(--surface);border-radius:8px;padding:9px 12px;font-size:13px;display:flex;align-items:center;gap:8px}
+.cn{color:var(--accent2)}.cm{color:var(--warn)}.cs{color:var(--danger)}
+.sumbox{background:var(--surface);border-radius:8px;padding:12px 14px;font-size:14px;line-height:1.7;color:#cbd5e1;margin-bottom:10px}
+.verd{border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600}
+.vrs{background:#022c22;color:#34d399;border:1px solid #064e3b}
+.vrc{background:#2c1008;color:#fb923c;border:1px solid #431407}
+.vra{background:#2c0808;color:#f87171;border:1px solid #450a0a}
+.tabs{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-family:Cairo,sans-serif;font-size:13px;font-weight:600}
+.tab.on{background:var(--accent);color:#000;border-color:var(--accent)}
+.tc{display:none}.tc.on{display:block}
+.brow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;margin-bottom:5px;background:var(--surface);font-size:13px;border-right:3px solid var(--border);cursor:pointer}
+.brow:hover{opacity:.85}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px;margin-top:10px}
+.hi{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;overflow:hidden;white-space:nowrap}
+.hi:hover{border-color:var(--accent);color:var(--accent)}
+.hs{border-right:3px solid #34d399}.hc{border-right:3px solid #fb923c}.ha{border-right:3px solid #f87171}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.stat{background:var(--card);border-radius:10px;padding:14px;text-align:center;border:1px solid var(--border)}
+.stat strong{display:block;font-size:22px;font-weight:900}
+.stat span{font-size:12px;color:var(--muted)}
+.stat.ss strong{color:#34d399}.stat.sc strong{color:#fb923c}.stat.sa strong{color:#f87171}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="font-size:36px">🎬</div>
+  <div><h1>فلتر الأفلام العائلي</h1><p id="hstatus">جاهز</p></div>
+  <div class="badge"><strong id="dbcount">0</strong>فيلم محلل</div>
+</div>
+<div class="main">
+
+  <!-- Setup Screen -->
+  <div id="setupScreen" class="setup">
+    <h2>🔧 إعداد قاعدة البيانات</h2>
+    <p>اضغط "ابدأ البناء" لتحليل كل أفلامك الـ 1318 وحفظ النتائج في متصفحك تلقائياً.<br>
+    <strong style="color:var(--accent)">⏱️ يستغرق حوالي 15-20 دقيقة — مرة واحدة فقط للأبد!</strong></p>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn" id="startBtn" onclick="startBuild()">🚀 ابدأ البناء</button>
+      <button class="btn sec" id="resumeBtn" style="display:none" onclick="resumeBuild()">▶️ استكمال</button>
+      <button class="btn sec" onclick="skipSetup()">تخطي</button>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="pbar"></div></div>
+    <div class="progress-text" id="ptext">0 / 1318</div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <!-- Main App -->
+  <div class="app" id="appScreen">
+    <div class="stats-row">
+      <div class="stat ss"><strong id="sc">0</strong><span>✅ مناسب</span></div>
+      <div class="stat sc"><strong id="wc">0</strong><span>⚠️ تحذير</span></div>
+      <div class="stat sa"><strong id="ac">0</strong><span>🚫 غير مناسب</span></div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" id="tb1" onclick="sw(this,'t1')">🔍 فيلم واحد</button>
+      <button class="tab" id="tb2" onclick="sw(this,'t2')">📋 فحص متعدد</button>
+      <button class="tab" id="tb3" onclick="sw(this,'t3')">📊 كل المكتبة</button>
+      <button class="btn sec" style="margin-right:auto;padding:6px 12px;font-size:12px;border-radius:7px" onclick="goSetup()">⚙️ إعادة بناء</button>
+    </div>
+
+    <div id="t1" class="tc on">
+      <div class="sbox">
+        <label class="slabel">ابحث في مكتبتك</label>
+        <div class="srow">
+          <input type="text" id="inp" class="sinp" placeholder="اكتب اسم الفيلم..." autocomplete="off">
+          <div id="sugg" class="sugg"></div>
+          <button class="btn" onclick="checkSingle()">فحص</button>
+        </div>
+        <div class="hint">💡 النتائج فورية من قاعدة البيانات المحلية</div>
+      </div>
+      <div id="res"></div>
+    </div>
+
+    <div id="t2" class="tc">
+      <div class="sbox">
+        <label class="slabel">فحص عدة أفلام</label>
+        <textarea id="batch" class="sinp" style="width:100%;height:110px;resize:vertical" placeholder="كل فيلم في سطر..."></textarea>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button class="btn" onclick="doBatch()">🔍 فحص الكل</button>
+          <button class="btn sec" onclick="addSample()">➕ أمثلة</button>
+        </div>
+        <div id="bres" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <div id="t3" class="tc">
+      <div class="sbox">
+        <label class="slabel">تصفية المكتبة</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <button class="btn" onclick="filterLib('all')">الكل</button>
+          <button class="btn" style="background:#064e3b;color:#34d399" onclick="filterLib('safe')">✅ مناسب</button>
+          <button class="btn" style="background:#431407;color:#fb923c" onclick="filterLib('caution')">⚠️ تحذير</button>
+          <button class="btn" style="background:#450a0a;color:#f87171" onclick="filterLib('avoid')">🚫 غير مناسب</button>
+          <button class="btn sec" onclick="exportCSV()">📥 تصدير CSV</button>
+        </div>
+        <div id="liblist" style="max-height:500px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <div id="hist" style="display:none;margin-top:20px">
+      <div style="font-size:13px;color:var(--muted);font-weight:600">📂 آخر عمليات البحث</div>
+      <div class="hgrid" id="hgrid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MOVIES = ["McQueen(2018)", "SheRidesShotgun(2025)", "SisterAct2-BackintheHabit(1993)", "GladiatorII(2024)", "RogueWarfare-DeathofaNation(2020)", "PingPongSummer(2014)", "Mr.Nobody(2009)", "HarryPotterandthePhilosopher'sStone(2001)", "Fortress(2021)", "AquamanandtheLostKingdom(2023)", "EqualStandard(2021)", "Hangman(2017)", "BrotherhoodoftheWolf(2001)", "WonderWoman(2017)", "IAmWhatIAm(2021)", "Hickok(2017)", "CaptainAmerica-CivilWar(2016)", "TheGrey(2012)", "LokahChapter1-Chandra(2025)", "ItComesatNight(2017)", "TheIceRoad(2021)", "Badland(2019)", "TheHuntsman-Winter'sWar(2016)", "Dune(2021)", "GuardiansoftheGalaxy(2014)", "Don'tLookBack(2009)", "Aquarela(2018)", "Superman-RedSon(2020)", "BlackandBlue(2019)", "TheArrangement(1969)", "Pandemic(2016)", "AllWeHad(2016)", "SevenYearsofNight(2018)", "Goldfinger.1964", "EternalWinter(2018)", "GridironGang(2006)", "Kong-SkullIsland(2017)", "Dogma(1999)", "TheDeathofDickLong(2019)", "Hellboy-TheCrookedMan(2024)", "MyFriendAna(2023)", "TheSpaceBetweenUs(2017)", "Passengers(2016)", "Flatliners(2017)", "ConfessionsofaSociopathicSocialClimber(2005)", "Donbass(2016)", "TheRip(2026)", "ThePhenom(2016)", "Old(2021)", "Batman-Hush(2019)", "GhostintheShell(2017)", "WhatLoveLooksLike(2020)", "OperationNapoleon-TearsoftheWolf(2023)", "MeninHope(2011)", "Hamnet(2025)(1080pBluRayx26510bitEAC3Atmos7.1Silence)", "You.Only.Live.Twice.1967", "Kingsman-TheSecretService(2015)", "TheBob'sBurgersMovie(2022)", "AFaithfulMan(2018)", "TheImitationGame(2014)", "Bereavement(2010)", "TheFarewell(2019)", "AMinecraftMovie(2025)", "Blackhat(2015)", "Sahara(2005)", "LifeinaYear(2020)", "Wakefield(2017)", "Nightcrawler(2014)", "TrashFire(2016)", "MarsAttacks!(1996)", "KillingGunther(2017)", "AdAstra(2019)", "Dangerous(2021)", "PointBreak(1991)", "OdetoNothing(2018)", "Exposed(2016)", "Viral(2016)", "TheEmperorofParis(2018)", "TheTheoryofEverything(2014)", "LittleSister(2016)", "Rings(2017)", "StarTrekBeyond(2016)", "WalltoWall(2025)", "X-Men-FirstClass(2011)", "KnightsoftheZodiac(2023)", "Real.Steel.(2011)", "TwoWitches(2023)", "DeadBody(2017)", "SpaceJam-ANewLegacy(2021)", "TheHero(2017)", "BeautyandtheBeast(2017)", "Joker(2019)", "DjangoUnchained(2012)", "Hostiles(2017)", "BornlessOnes(2016)", "BlackPanther(2018)", "GoodBoys(2019)", "BlueMoon(2025)", "Primal(2019)", "HardTarget2(2016)", "IntheLandofSaintsandSinners(2023)", "BringHerBack(2025)", "AWomanatWar(1991)", "NightmareAlley(2021)", "Ghostbusters-Afterlife(2021)", "Zombieland-DoubleTap(2019)", "TheByeByeMan(2017)", "We,theMarines(2017)", "LethalWeapon2(1989)", "TheForest(2016)", "TheHungerGames-TheBalladofSongbirds&Snakes(2023)", "ColorMeTrue(2018)", "DreamScenario(2023)", "Skyfall(2012)", "Table19(2017)", "TheGoldenCompass(2007)", "Blind(2017)", "HighFidelity(2000)", "Relay(2025)", "AngelHasFallen(2019)", "PlusOne(2019)", "JasonBourne(2016)", "SouthsidewithYou(2016)", "Spider-Man-FarFromHome(2019)", "TheInvasion(2007)", "Rojo(2018)", "KaatrinMozhi(2018)", "TheHollars(2016)", "1Buck(2017)", "Thor-Ragnarok(2017)", "Sleight(2016)", "TheDarkness(2016)", "TheTaxCollector(2020)", "MiddleSchool-TheWorstYearsofMyLife(2016)", "Extortion(2017)", "SinCity(2005)", "P.O.BoxTintoBrass(1995)", "Brahms-TheBoyII(2020)", "DarkWeb-Cicada3301(2021)", "PitchPerfect3(2017)", "Chhaava(2025)", "Mission-Impossible-TheFinalReckoning-IMAX(2025)", "TheUglyStepsister(2025)", "MotherlessBrooklyn(2019)", "HowMuchDoYouLoveMe(2005)", "WishMan(2019)", "CHiPs(2017)", "Ray&Liz(2018)", "Crew(2024)", "Ouija-OriginofEvil(2016)", "BadBoysforLife(2020)", "Awake(2019)", "FenderBender(2016)", "X-Men-Apocalypse(2016)", "BakedinBrooklyn(2016)", "Equity(2016)", "MartySupreme(2025)", "TheyClonedTyrone(2023)", "VeryOrdinaryCouple(2013)", "SwissArmyMan(2016)", "Columbus(2017)", "AbovetheShadows(2019)", "NewLife(2016)", "TheBeguiled(2017)", "Spree(2020)", "Fish(2023)", "Don'tBreathe2(2021)", "WheretheTruthLies(2005)", "Fences(2016)", "MayDecember(2023)", "KesariChapter2-TheUntoldStoryofJallianwalaBagh(2025)", "For.Your.Eyes.Only.1981", "GetOut(2017)", "Sylvia(2003)", "Underworld-BloodWars(2016)", "SameKindofDifferentasMe(2017)", "JohnWick-Chapter3-Parabellum(2019)", "MeettheBlacks(2016)", "Jumanji-TheNextLevel(2019)", "Silence(2016)", "TheConjuring-LastRites-IMAX(2025)", "InSearchofGreatness(2018)", "Drowning(2019)", "Freaky(2020)", "TheShawshankRedemption(1994)", "Hedda(2025)", "Kill'emAll(2017)", "TheSquidandtheWhale(2005)", "JusticeLeaguevs.TeenTitans(2016)", "Ant-Man(2015)", "ShortcuttoHappiness(2007)", "ForceofNature(2020)", "PatientSeven(2016)", "HAQ(2011)", "ABadMomsChristmas(2017)", "Sgt.Rock(2019)", "DreamHouse(2011)", "TheFinestHours(2016)", "Oblivion(2013)", "Saiyaara(2025)", "TheProdigy(2019)", "Submission(2018)", "MyFriendDahmer(2017)", "Avatar(2009)", "TheArtofSelf-Defense(2019)", "AReindeer'sJourney(2018)", "SentimentalValue(2025)", "BirdsofPrey(1992)", "JustMercy(2019)", "HarryPotterandtheGobletofFire(2005)", "Werewolf(2017)", "IAmWrath(2016)", "TexasChainsaw3D(2013)", "TheLoveWitch(2016)", "Avengers-Endgame(2019)", "TheCountofMonteCristo(2024)", "TrueSpirit(2023)", "TheAccountant(2016)", "NYAD(2023)", "Morbius(2022)", "SealedLips(2018)", "TheCurseofLaLlorona(2019)", "EscapePlan2-Hades(2018)", "Interstellar(2014)", "TeenTitansGo!vs.TeenTitans(2019)", "Mohawk(2018)", "SavageDog(2017)", "OnlytheBrave(2017)", "CityofGhosts(2017)", "Albion-TheEnchantedStallion(2016)", "Geostorm(2017)", "Alone(2020)", "Vengeance(2022)", "EyesWideShut(1999)", "BionicShowdown-TheSixMillionDollarManandtheBionicWoman(1989)", "TheDeparted(2006)", "Security(2017)", "Octopussy.1983", "LayerCake(2004)", "Harriet(2019)", "Transpecos(2016)", "TheMatrix(1999)", "AMadeaFamilyFuneral(2019)", "TransformersRiseOfTheBeasts(2023)", "Downsizing(2017)", "Superman(2025)", "MidnightSpecial(2016)", "PhoenixForgotten(2017)", "RogueWarfare(2019)", "Killerman(2019)", "HappyDeathDay2U(2019)", "TheMatrixRevolutions(2003)", "TheChoice(2016)", "SunnySanskariKiTulsiKumari(2025)", "Licence.to.Kill.1989", "TheAmazingSpider-Man2(2014)", "ThePrestige(2006)", "Diabolik-GinkoAttacks!(2022)", "Stuber(2019)", "Ava(2020)", "USSIndianapolis-MenofCourage(2016)", "TheyReach(2020)", "TeenageMutantNinjaTurtles-OutoftheShadows(2016)", "Vengeance-ALoveStory(2017)", "LoveActually(2003)", "Jackals(2017)", "TheCurrentWar(2018)", "TheStakelander(2016)", "TheMonkey(2025)", "AHistoryofViolence-CriterionCollection(2005)", "OneBattleAfterAnother(2025)", "Parasites(2019)", "TheRiotandtheDance-Water(2020)", "FistFight(2017)", "GranTorino(2008)", "Asterix&Obelix-MissionCleopatra(2002)", "TheMatchbreaker(2016)", "TheEndless(2017)", "JayKelly(2025)", "TheBigSick(2017)", "CaptainMarvel(2019)", "TheTrust(2016)", "Hail,Caesar!(2016)", "Her(2013)", "Shutter(2004)", "NineDays(2021)", "DogEatDog(2016)", "Diabolik-WhoAreYou(2023)", "TheUsualSuspects(1995)", "ItChapterTwo(2019)", "Slingshot(2024)", "Harry.Potter.and.the.Half-Blood.Prince.(2009)", "FunMomDinner(2017)", "Shoot'EmUp(2007)", "DallasBuyersClub(2013)", "ChainsawMan-TheMovie-RezeArc(2025)", "TheRebound(2009)", "The.Living.Daylights.1987", "Thor-TheDarkWorld(2013)", "StarWars-TheForceAwakens(2015)", "Jarhead3-TheSiege(2016)", "CriticalThinking(2020)", "NoHardFeelings(2023)", "Marshall(2017)", "ACrookedSomebody(2018)", "TheDreamers(2003)", "Aladdin(2019)", "Galveston(2018)", "EverythingEverywhereAllatOnce(2022)", "TheShapeofWater(2017)", "BladeRunner2049(2017)", "TheBestofEnemies(2019)", "JungleCruise(2021)", "Titanic(1997)", "FamilySwitch(2023)", "EdgeofTomorrow(2014)", "RideAlong2(2016)", "TheWall(2017)", "JohnandtheHole(2021)", "Novitiate(2017)", "DoraandtheLostCityofGold(2019)", "Don'tLookUp(2021)", "WhileYouWereSleeping(1995)", "Godzillavs.Kong(2021)", "Hello,MyNameIsDoris(2015)", "ConantheBarbarian-ExtendedEdition(1982)", "TropicThunder(2008)", "AftertheWedding(2019)", "HereToday(2021)", "MyBigFatGreekWedding2(2016)", "AmateurNight(2016)", "NowYouSeeMe(2013)", "Dungeons&Dragons-HonorAmongThieves(2023)", "Jumanji-WelcometotheJungle(2017)", "ReignoftheSupermen(2019)", "RoberttheBruce(2019)", "AmericanSniper(2014)", "Thor(2011)", "IronMan2(2010)", "TheCircle(2017)", "Crypto(2019)", "Avatar-FireandAsh(2025)", "F9(2021)", "TheMisfits(2021)", "TheTuxedo(2002)", "BeauIsAfraid(2023)", "EternalSunshineoftheSpotlessMind(2004)", "TheExtraordinaryJourneyoftheFakir(2018)", "JusticeLeagueDark(2017)", "TheStylist(2020)", "DeadRising-Endgame(2016)", "TheLostCityofZ(2017)", "HellorHighWater(2016)", "CorrectiveMeasures(2022)", "LightsOut(2016)", "TheWholeTruth(2016)", "GirlsTrip(2017)", "Kickboxer-Vengeance(2016)", "Sinners(2025)", "PiratesoftheCaribbean-DeadMan'sChest(2006)", "SamsonandDelilah(1996)", "BombCity(2017)", "Sniper-Assassin'sEnd(2020)", "Back.to.the.Future.Part.II.(1989)", "FalconLake(2022)", "TheAmazingSpider-Man(2012)", "2048-NowheretoRun(2017)", "AVerySordidWedding(2017)", "CaptainFantastic(2016)", "Gook(2017)", "NoCountryforOldMen(2007)", "TheInstitute(2017)", "EscapeRoom-TournamentofChampions(2021)", "GoodKids(2016)", "Jolt(2021)", "BecomingAstrid(2018)", "Float(2024)", "Don'tLetHerIn(2021)", "ScaryMovie5-Unrated(2013)", "BeforeSunrise(1995)", "LetHimGo(2020)", "TheJesusRolls(2019)", "Nerve(2016)", "AWorkingMan(2025)", "DowntonAbbey-TheGrandFinale(2025)", "Zoolander2(2016)", "Criminal(2016)", "SilkRoad(2021)", "TheLittleThings(2021)", "AGhostStory(2017)", "GranTurismo(2023)", "Witnesses(2021)", "CreationoftheGodsI-KingdomofStorms(2023)", "MeganLeavey(2017)", "MadeinItaly(2018)", "CosmicSin(2021)", "Downrange(2018)", "LoveAtLeast(2018)", "TheHandmaiden(2016)", "TheCaseforChrist(2017)", "WomanWalksAhead(2018)", "Moonfall(2022)", "On.Her.Majesty's.Secret.Service.1969", "TheLovers(2017)", "TheAvengers(2012)", "TermLife(2016)", "BeforeIWake(2016)", "TheRevenant(2015)", "DoctorWho-TheDayoftheDoctor(2013)", "BulletTrainExplosion(2025)", "TheOut-Laws(2023)", "Spider-Man-Homecoming(2017)", "CarnagePark(2016)", "Avengers-InfinityWar(2018)", "HowtoBeSingle(2016)", "TheKillRoom(2023)", "TheCleaner(2021)", "SavingPrivateRyan(1998)", "Joseph(1995)", "TheHustle(2019)", "TheDisasterArtist(2017)", "GuillermodelToro'sPinocchio-CriterionCollection(2022)", "MilesDavis-BirthoftheCool(2019)", "TwoNightStand(2014)", "BeetlejuiceBeetlejuice(2024)", "Don'tTellaSoul(2020)", "ColorOutofSpace(2020)", "The.Spy.Who.Loved.Me.1977", "Snatched(2017)", "WeSummontheDarkness(2020)", "DeathontheNile(2022)", "TheUnhealer(2020)", "SongSungBlue(2025)", "PiratesoftheCaribbean-DeadMenTellNoTales(2017)", "Carol(2015)", "TheHoldovers(2023)", "Eloise(2016)", "PoorThings(2023)", "BoogieNights(1997)", "ThePost(2017)", "Argo(2012)", "Joshy(2016)", "IronMan3(2013)", "TheNiceGuys(2016)", "JustaBreathAway(2018)", "AlmostChristmas(2016)", "TheSecondWind(2007)", "TheMagnificentSeven(2016)", "Radioflash(2019)", "TheTruthAboutLove(2005)", "AftertheHunt(2025)", "Ride(2018)", "AnnabelleComesHome(2019)", "IStillBelieve(2020)", "TheLostBus(2025)", "TheAccountant²(2025)", "Dual(2022)", "AlltheMoneyintheWorld(2017)", "Deadlock(2021)", "TheGlassCastle(2017)", "InsideMan-MostWanted(2019)", "TheGrandBudapestHotel(2014)", "Gonjiam-HauntedAsylum(2018)", "TheJacket(2005)", "Anaconda(2025)", "Buster'sMalHeart(2017)", "Copshop(2021)", "SoundofFreedom(2023)", "KevinHart-WhatNow(2016)", "KillersoftheFlowerMoon(2023)", "TheCuriousCaseofBenjaminButton(2008)", "ADog'sPurpose(2017)", "Extraction2(2023)", "MiraclesfromHeaven(2016)", "Selfless(2015)", "Vixen-TheMovie(2017)", "BrokenVows(1987)", "TheBurial(2023)", "MafiaMamma(2023)", "Live.and.Let.Die.1973", "Honey3-DaretoDance(2016)", "DangerClose(2017)", "The.Lord.of.the.Rings.The.Two.Towers.(2002)", "PetSematary(2019)", "IndianaJonesandtheDialofDestiny(2023)", "ThePerfectMatch(2016)", "Arkansas(2020)", "TheMarine5-Battleground(2017)", "MyFather,Die(2016)", "GameofThrones-Conquest&Rebellion-AnAnimatedHistoryoftheSevenKingdoms(2017)", "TINA(2021)", "Ana(2020)", "Riddick-Director'sCut(2013)", "SanAndreas(2015)", "ThePurge-ElectionYear(2016)", "TheMask(1994)", "TheLostValentine(2011)", "NightAlwaysComes(2025)", "TheDarkKnight(2008)", "Cowboys&Aliens(2011)", "Prisoners(2013)", "ScaryStoriestoTellintheDark(2019)", "Justice(2017)", "RebelintheRye(2017)", "ManchesterbytheSea(2016)", "Friendsgiving(2020)", "TheCursed(2021)", "SlumdogMillionaire(2008)", "MercuryPlains(2016)", "Appleseed-ExMachina(2007)", "ReignofFire(2002)", "Batman&Bill(2017)", "After(2019)", "ColdStorage(2026)", "BostonStrangler(2023)", "LastSeenAlive(2022)", "StreetSurvivors-TheTrueStoryoftheLynyrdSkynyrdPlaneCrash(2020)", "Spirited(2022)", "TheCall(2020)", "Brightburn(2019)", "Café(2011)", "ToCatchaKiller(2023)", "TheWondersofNature(2017)", "Apollo11(2019)", "TheGallowsActII(2019)", "Santet(1988)", "ThePredator(2018)", "Brad'sStatus(2017)", "Unforgettable(2017)", "TheBigShort(2015)", "SnakeEyes(1998)", "Atomica(2017)", "PiratesoftheCaribbean-AtWorld'sEnd(2007)", "TheDoorman(2020)", "Prometheus(2012)", "Don'tBreathe(2016)", "Can'tHardlyWait(1998)", "TheShift(2023)", "TheDuel(2016)", "WinniethePooh(2011)", "Dune-PartTwo(2024)", "TragedyGirls(2017)", "BulletTrain(2022)", "Wreck-ItRalph(2012)", "TheSanctityofSpace(2022)", "BringHappinessHome2015(2015)", "LoganLucky(2017)", "LethalWeapon4(1998)", "TheDarkTower(2017)", "Mud(2013)", "Depraved(2019)", "TheCleansingHour(2019)", "BattleDrone(2018)", "ManofSteel(2013)", "WynonnaEarp-Vengeance(2024)", "HappyDeathDay(2017)", "WeHaveAlwaysLivedintheCastle(2019)", "TheButterflyEffect2(2006)", "RBG(2018)", "Conan(1997)", "FastX(2023)", "FatherFigures(2017)", "AdoptaHighway(2019)", "Dhurandhar(2025)", "Harry.Potter.and.the.Deathly.Hallows.Part.2.(2011)", "TheVanishingofSidneyHall(2018)", "Phantasm-Ravager(2016)", "OperationFortune-RusedeGuerre(2023)", "Countdown(2019)", "AHauntinginVenice(2023)", "Kantara-ALegend-Chapter1(2025)", "LastFlagFlying(2017)", "TheArtofRacingintheRain(2019)", "Catfight(2016)", "TheYoungMessiah(2016)", "TheGracefieldIncident(2017)", "Intolerance-Love'sStruggleThroughouttheAges(1916)", "28YearsLater(2025)", "Mr.Church(2016)", "TheHorde(2016)", "AfterClass(2019)", "Birdmanor(TheUnexpectedVirtueofIgnorance)(2014)", "DeuceBigalow-EuropeanGigolo(2005)", "Harry.Potter.and.the.Prisoner.of.Azkaban.(2004)", "Harry.Potter.and.the.Order.of.the.Phoenix.(2007)", "Limitless(2011)", "DeadlyBlessing(1981)", "Room(2015)", "Predator-Badlands(2025)", "DoctorSleep(2019)", "LostGirls&LoveHotels(2020)", "SurvivetheGame(2021)", "HiddenFigures(2016)", "TheExpendables2(2012)", "Infinite(2021)", "Fast&FuriousPresents-Hobbs&Shaw(2019)", "SherlockHolmes(2009)", "Magellan(2017)", "TheAdventuresofTintin(2011)", "TheDevilYouKnow(2022)", "WonderWoman1984(2020)", "SuicideSquad(2016)", "ChasingtheWind(2025)", "ZforZachariah(2015)", "OutlawsandAngels(2016)", "GameofThrones-TheLastWatch(2019)", "Urge(2016)", "IfOnly(2004)", "BeyondSkyline(2017)", "Midsommar(2019)", "TheBuildersoftheAlhambra(2022)", "BridgetJones'sBaby(2016)", "IKnowWhatYouDidLastSummer(1997)", "Scoop(2024)", "RedDragon(2002)", "ISeeYou(2019)", "Freejack(1992)", "Starman(1984)", "Bodied(2018)", "TheQuarry(2020)", "ScaryMovie(2000)", "Neighbors2-SororityRising(2016)", "FreeGuy(2021)", "Harry.Potter.and.the.Sorcerers.Stone.(2001)", "AllEyezonMe(2017)", "TheNightSitter(2018)", "Rush-TimeStandStill(2016)", "TheExpendables3-Unrated(2014)", "GreenLantern-BewareMyPower(2022)", "Greater(2016)", "TheDescent(2005)", "WhenWeFirstMet(2018)", "TheLostCity(2022)", "Arrival(2016)", "I'mNotAshamed(2016)", "MasterGardener((2022)", "Appleseed(2004)", "Wonder(2017)", "Boost(2016)", "Unplanned(2019)", "SmallThingsLikeThese(2024)", "StarWars-TheLastJedi(2017)", "Chloe(2009)", "Held(2020)", "Agora(2009)", "HallPass(2011)", "DearDictator(2018)", "DieinaGunfight(2021)", "KnockedUp(2007)", "TheManfromEarth-Holocene(2017)", "LikeaBoss(2020)", "Daylight'sEnd(2016)", "ApocalypseZ-TheBeginningoftheEnd(2024)", "Mainstream(2021)", "RichardJewell(2019)", "The.Lord.of.the.Rings.The.Return.Of.The.King.(2003)", "Hellboy(2019)", "HauntedMansion(2023)", "ChronicallyMetropolitan(2016)", "Okja(2017)", "TheGirlwiththeDragonTattoo(2011)", "TheHottestState(2007)", "AppleseedAlpha(2014)", "LethalWeapon3(1992)", "DawnofthePlanetoftheApes(2014)", "InsideOut(2015)", "TheForeverPurge(2021)", "NoTimetoDie(2021)", "DeepBlueSea2(2018)", "EverybodyWantsSome!!(2016)", "WakeUpDeadMan-AKnivesOutMystery(2025)", "Jewtopia(2012)", "CertainWomen(2016)", "Morgan(2016)", "MikeandDaveNeedWeddingDates(2016)", "GoneGirl(2014)", "TellingYou(1998)", "Back.to.the.Future.(1985)", "TheOldGuard2(2025)", "Alita-BattleAngel(2019)", "TheWizardofLies(2017)", "Diamonds.Are.Forever.1971", "Spell(2020)", "TheSorcerer'sApprentice(2010)", "FlyMetotheMoon(2024)", "Se7en(1995)", "The.Hobbit.The.Desolation.of.Smaug.(2013)", "The.Hobbit.An.Unexpected.Journey.(2012)", "TheAudreyHepburnStory(2000)", "WishUpon(2017)", "AmericanFighter(2020)", "LoandBehold-ReveriesoftheConnectedWorld(2016)", "ScaryMovie4-Unrated(2006)", "Alien(1979)", "HarryPotterandtheDeathlyHallows-Part1(2010)", "Bloodshot(2020)", "TheBookofHenry(2017)", "Unbroken-PathtoRedemption(2018)", "FearofRain(2021)", "Amityville-TheAwakening(2017)", "Nightworld(2017)", "Boone-TheBountyHunter(2017)", "TheFrenchDispatchoftheLiberty,KansasEveningSun(2021)", "Braveheart(1995)", "Tetris(2023)", "Wildflower(2023)", "DirtyGrandpa(2016)", "JusticeLeague(2017)", "Cameraperson(2016)", "TheSpecialist(1994)", "ForrestGump(1994)", "TheSeaofTrees(2016)", "JustGettingStarted(2017)", "Papillon(2017)", "GettheGirl(2017)", "Keanu(2016)", "Scream(2022)", "1917(2019)", "Allegiant(2016)", "GoodFortune(2025)", "Dr.No(1962)", "Underwater(2020)", "TheBalladofLeftyBrown(2017)", "CafeSociety(1997)", "Spotlight(2015)", "Furiosa-AMadMaxSaga(2024)", "TheWhistleblower(2010)", "GoldenEye.1995", "TheConjuring-TheDevilMadeMeDoIt(2021)", "Dracula(1996)", "Greenland(2020)", "Back.to.the.Future.Part.III.(1990)", "ThePoisonRose(2019)", "WhatMenWant(2019)", "PulpFiction(1994)", "Pandora(2016)", "SkateKitchen(2018)", "TheEqualizer3(2023)", "JohnWick-Chapter2(2017)", "TheTwoFacesofJanuary(2014)", "Pavarotti(2019)", "OnceUponaTimeinVenice(2017)", "BadMoms(2016)", "WalkingOut(2017)", "Priscilla(2023)", "LightofMyLife(2019)", "AnotherSimpleFavor(2025)", "EscapeRoom(2019)", "Assassin'sCreed(2016)", "TheVault(2017)", "KillingHasselhoff(2017)", "Life,Animated(2016)", "BuryingtheEx(2014)", "AboveSuspicion(2019)", "Rambo-LastBlood(2019)", "MLKFBI(2020)", "Die.Another.Day.2002", "HarryPotterandtheDeathlyHallows-Part2(2011)", "Malignant(2021)", "TheKing'sSpeech(2010)", "Defiance(2008)", "TheButterflyEffect3-Revelations(2009)", "Midway(2019)", "DeadAgaininTombstone(2017)", "FlagDay(2021)", "Gold(2016)", "ReadyorNot(2019)", "Heartbreakers(2001)", "Breakthrough(2019)", "ARainyDayinNewYork(2019)", "Where'dYouGo,Bernadette(2019)", "PattiCake$(2017)", "Everything,Everything(2017)", "ThePhotograph(2020)", "KeepingUpwiththeJoneses(2016)", "PhantomThread(2017)", "EveryTimeIDie(2020)", "TheSwingofThings(2020)", "Looper(2012)", "MakingofTheWildPearTree(2018)", "PainHustlers(2023)", "TheIntouchables(2011)", "E.TtheExtraTerrestrial(1982)", "The.World.Is.Not.Enough.1999", "LadyBird(2017)", "Don'tLetGo(2019)", "The.Hobbit.The.Battle.of.the.Five.Armies.(2014)", "Driveways(2020)", "PitchBlack(2000)", "SearchingforBobbyFischer(1993)", "TheSecret-DaretoDream(2020)", "Air(2023)", "PrimalFear(1996)", "NocturnalAnimals(2016)", "Beast(2022)", "TheHousemaid(2025)", "WhyHim(2016)", "StarTrek(2009)", "TheLastMovieStar(2018)", "Rogue(2020)", "Tesla(2020)", "FreaksofNature(2015)", "IronMan(2008)", "Mine(2016)", "ShutterIsland(2010)", "UnderSuspicion(2000)", "TheTenCommandments(1956)", "TheMidnightMan(2016)", "TheCovenant(2023)", "RentalFamily(2025)", "SouthofHeaven(2021)", "6Below-MiracleontheMountain(2017)", "TheGreatWall(2016)", "Ant-ManandtheWasp(2018)", "OnceUponaTime...inHollywood(2019)", "WerewolvesWithin(2021)", "BossLevel(2021)", "Riddick-Remastered(2013)", "SitaareZameenPar(2025)", "CaptiveState(2019)", "TheLongWalk(2025)", "Nope(2022)", "GuardiansoftheGalaxyVol.2(2017)", "GetaJob(2016)", "CatchMeIfYouCan(2002)", "Transformers-TheLastKnight(2017)", "Code8PartII(2024)", "HalloweenKills(2021)", "HonestThief(2020)", "Heritage(2019)", "Mine9(2019)", "I,Tonya(2017)", "TraintoBusan(2016)", "NightHunter(2019)", "Havoc(2025)", "Gravity(2013)", "NationalParksAdventure(2016)", "MarjoriePrime(2017)", "JimmyVestvood-AmerikanHero(2016)", "QuantumofSolace(2008)", "IceRoadKiller(2022)", "PercyJackson&theOlympians-TheLightningThief(2010)", "Willy'sWonderland(2021)", "Reptile(2023)", "AllNighter(2017)", "Hustlers(2019)", "Chappaquiddick(2018)", "TheGoodNeighbor(2016)", "Inception(2010)", "TheGoldfinch(2019)", "Deadsight(2018)", "TheBlackPhone(2022)", "Mulan(2020)", "Lowriders(2017)", "BehindEnemyLines(2001)", "Spectre(2015)", "TheExpendables-ExtendedEdition(2010)", "TheWeddingYear(2019)", "Weapons(2025)", "Elvis&Nixon(2016)", "AreYouThereGodIt'sMe,Margaret.(2023)", "WhiskeyTangoFoxtrot(2016)", "HarryPotterandthePrisonerofAzkaban(2004)", "WarDogs(2016)", "PiratesoftheCaribbean-OnStrangerTides(2011)", "Glass(2019)", "Golda(2023)", "TheShadow'sEdge(2025)", "KillChain(2020)", "MortalKombatLegends-Scorpion'sRevenge(2020)", "Land(2021)", "There'sSomethingintheBarn(2023)", "TheNewMutants(2020)", "TheContractor(2022)", "WolfMother(2016)", "TheKiller(2023)", "PrideandPrejudiceandZombies(2016)", "BlueBayou(2021)", "TheConductor(2020)", "FordvFerrari(2019)", "RoughNight(2017)", "LifeontheLine(2016)", "LateNight(2019)", "Blue.Giant.2023", "GirlontheThirdFloor(2019)", "TheHolidayJunkie(2024)", "TheDisappointmentsRoom(2016)", "RaatAkeliHai-TheBansalMurders(2025)", "21JumpStreet(2012)", "TheBoss(2016)", "Vanquish(2021)", "P2(2024)", "InaValleyofViolence(2016)", "SilverLiningsPlaybook(2012)", "ScorpionKing-BookofSouls(2018)", "Swingers(1996)", "LittleWomen(2019)", "Ruth&Boaz(2025)", "CultofChucky(2017)", "Stronger(2017)", "EveryDayaGoodDay(2018)", "BlueMountainState-TheRiseofThadland(2016)", "IntimateStrangers(2020)", "12MightyOrphans(2021)", "Momentum(2015)", "WheretheCrawdadsSing(2022)", "TheKing'sMan(2021)", "Soul(2020)", "TheDivorceParty(2019)", "TheInvitation(2022)", "KnivesOut(2019)", "Barbershop-TheNextCut(2016)", "Risen(2016)", "TheUnholyTrinity(2025)", "Fargo(1996)", "RulesDon'tApply(2016)", "HomeAgain(2017)", "TheHungerGames(2012)", "SupermanII(1980)", "LivebyNight(2016)", "TheDevilsOwn(1997)", "DarkPhoenix(2019)", "Stargate(1994)", "Inferno(2016)", "LifeLike(2019)", "TheMummy(2017)", "HouseofGucci(2021)", "TheTank(2023)", "FiveFeetApart(2019)", "AnthemofaTeenageProphet(2019)", "SupermanReturns(2006)", "TrojanWar(1997)", "WhatHappensLater(2023)", "Frank&Lola(2016)", "Nuremberg(2025)", "TheTearsmith(2024)", "LeavetheWorldBehind(2023)", "ThePassionoftheChrist(2004)", "TheBluff  ((2026)", "SuperDarkTimes(2017)", "Pete'sDragon(2016)", "ThePaleDoor(2020)", "Masterminds(2016)", "JayandSilentBobReboot(2019)", "Skyscraper(2018)", "TheGreenMile(1999)", "Joysticks(1983)", "JudasandtheBlackMessiah(2021)", "Shazam!(2019)", "Sisu-RoadtoRevenge(2025)", "BigKill(2019)", "Avengers-AgeofUltron(2015)", "GodsofEgypt(2016)", "MoneyMonster(2016)", "CollateralBeauty(2016)", "CodeofHonor(2016)", "The5thWave(2016)", "WarforthePlanetoftheApes(2017)", "DeathRace-BeyondAnarchy(2018)", "CanYouKeepaSecret(2019)", "Where'sMyRoyCohn(2019)", "VforVendetta(2006)", "Houseof9(2005)", "TheWolfofWallStreet(2013)", "Warfare(2025)", "TheGorge(2025)", "TheNakedGun(2025)", "Kidnap(2017)", "Venom-LetThereBeCarnage(2021)", "ThePaganKing(2018)", "PiratesoftheCaribbean-TheCurseoftheBlackPearl(2003)", "Traded(2016)", "StarWars-TheRiseofSkywalker(2019)", "Sultan(1987)", "ThammanoonNiyomtrongvs.AlexWinwood(2024)", "Ghostbusters(2016)", "SupermanIII(1983)", "TerroronthePrairie(2022)", "HarryPotterandtheOrderofthePhoenix(2007)", "Fishtales(2007)", "ABeautifulMind(2001)", "ScaryMovie3(2003)", "ShotCaller(2017)", "PalmSprings(2020)", "PleaseStandBy(2018)", "Superman(1978)", "Meg2-TheTrench(2023)", "TheEdgeofSeventeen(2016)", "TheDinner(2017)", "PatriotGames(1992)", "Dobermann(1997)", "RedEye(2025)", "StarTrekIntoDarkness(2013)", "LadyoftheManor(2021)", "Never.Say.Never.Again.1983", "Arcadian(2024)", "SupermanII-TheRichardDonnerCut(2006)", "Cruella(2021)", "WonderWheel(2017)", "TimeTrap(2018)", "GreaseLive(2016)", "Dhadak(2018)", "MonsterParty(2018)", "TheClientList(2010)", "AmericanAssassin(2017)", "DarkWaters(2019)", "Drive(2011)", "TheHangover(2009)", "F1(2025)", "Overcomer(2019)", "Baywatch(2017)", "HouseArrest(1996)", "TheHitman'sBodyguard(2017)", "AmericanExit(2019)", "TheTrumanShow(1998)", "SaveYourselves!(2020)", "TheBelkoExperiment(2016)", "Mission-Impossible-RogueNation(2015)", "Sabrina(1995)", "CastawayontheMoon(2009)", "QueenofKatwe(2016)", "Irreversible-Remastered(2013)", "Mayday(2021)", "TheSocialNetwork(2010)", "Tremors-ShriekerIsland(2020)", "TheShow(2017)", "Munich(2005)", "Mythica-TheIronCrown(2016)", "TheBourneIdentity(2002)", "CaptainAmerica-TheWinterSoldier(2014)", "Feral(2018)", "AtomicBlonde(2017)", "Leatherface(2017)", "Daddy'sGirl(2018)", "TwofortheMoney(2005)", "InFullBloom(2019)", "TheMarvels(2023)", "AHiddenLife(2019)", "RogueOne-AStarWarsStory(2016)", "ZeroDays(2016)", "Tiny-TheLifeofErinBlackwell(2016)", "JasperMall(2020)", "2036-NexusDawn(2017)", "TheNutcrackerandtheFourRealms(2018)", "FairPlay(2023)", "AmericanMade(2017)", "Piranha(1995)", "TillDeath(2021)", "TrainDreams(2025)", "Offseason(2022)", "TheEscort(2016)", "PicassoTrigger(1988)", "TheTransfiguration(2016)", "WhentheBoughBreaks(2016)", "Rust(2025)", "KingArthurandtheKnightsoftheRoundTable(2017)", "TheLayover(2017)", "Interrogation(2016)", "TheClapper(2017)", "TheBourneUltimatum(2007)", "ManhattanNight(2016)", "TheBoat(2019)", "Darlin(2019)", "JohnWick-Chapter4(2023)", "ACureforWellness(2017)", "TheRunner(2022)", "SocietyoftheSnow(2023)", "OldDads(2023)", "Lasso(2017)", "Memento(2000)", "TaketheBall,PasstheBall(2018)", "WarningShot(2018)", "BlackWidow(2021)", "Whiplash(2014)", "LongShot(2019)", "NeverBackDown-Revolt(2021)", "MostBeautifulIsland(2017)", "TheBirthofaNation(2016)", "ThePianist(2002)", "ThePeanutButterFalcon(2019)", "Firecrackers(2013)", "DanielIsn'tReal(2019)", "TheMermaid-LakeoftheDead(2018)", "Bugonia(2025)", "DoctorStrange(2016)", "LBJ(2017)", "TripleFrontier(2019)", "TheComedian(2016)", "Jockey(2021)", "ArmyofOne(2016)", "TheBetaTest(2021)", "CasinoRoyale(2006)", "Songbird(2020)", "Annabelle-Creation(2017)", "AmericanSicario(2021)", "Doom-Unrated(2005)", "Cell(2016)", "TheWarwithGrandpa(2020)", "OfficeChristmasParty(2016)", "TheSuicideSquad(2021)", "300(2007)", "Gifted(2017)", "From.Russia.With.Love.1963", "Indiscretion(2016)", "Moonraker.1979", "Venom-TheLastDance(2024)", "Mission-Impossible-GhostProtocol(2011)", "Jackie(2016)", "Money(2016)", "APrivateLife(2026)", "MissPeregrine'sHomeforPeculiarChildren(2016)", "TheCreator(2023)", "TheManintheIronMask(1998)", "10CloverfieldLane(2016)", "MyMother’sFriend2(2019)", "TheLastFullMeasure(2020)", "TheFounder(2016)", "Kantara(2022)", "12FeetDeep(2018)", "TheMatrixResurrections(2021)", "TheBourneSupremacy(2004)", "Atlas(2024)", "S.W.A.T.-UnderSiege(2017)", "LethalWeapon(1987)", "Tenet(2020)", "Sully(2016)", "G20(2025)", "TheRunningMan(2025)", "MySpy(2020)", "Eraser-Reborn(2022)", "TheShallows(2016)", "JohnWick(2014)", "A.View.to.a.Kill.1985", "TheBabysitters(2008)", "TheButterflyEffect(2004)", "TheMartian(2015)", "TheMother(2023)", "Alien-Covenant(2017)", "WhyDon'tYouJustDie!(2018)", "TearsoftheSun(2003)", "TheNegotiator(1998)", "Expend4bles(2023)", "TheDarkKnightRises(2012)", "Woodshock(2017)", "DeepWater(2022)", "CompleteUnknown(2016)", "MarkFelt-TheManWhoBroughtDowntheWhiteHouse(2017)", "TheGrudge(2019)", "FramingJohnDeLorean(2019)", "IfIHadLegsI'dKickYou(2025)", "CaptainAmerica-TheFirstAvenger(2011)", "TheMarksman(2021)", "TheHollowPoint(2016)", "Missing(2023)", "IStillKnowWhatYouDidLastSummer(1998)", "Memory(2022)", "LittleChildren(2006)", "Isn'tItRomantic(2019)", "BloodRoad(2017)", "NancyDrewandtheHiddenStaircase(2019)", "ScaryMovie2(2001)", "TheFloridaProject(2017)", "TheSilenceoftheLambs(1991)", "WorldWarZ(2013)", "Shang-ChiandtheLegendoftheTenRings(2021)", "RedemptionDay(2021)", "LicoricePizza(2021)", "WindChill(2007)", "FirstReformed(2018)", "ImpracticalJokers-TheMovie(2020)", "Thunderball.1965", "TheItalianJob(2003)", "Sicario(2015)", "Catwoman-Hunted(2022)", "BatmanvSuperman-DawnofJustice(2016)", "TheBadKids(2016)", "TellMeHowIDie(2016)", "IAmLegend(2007)", "DeepwaterHorizon(2016)", "AnInconvenientSequel-TruthtoPower(2017)", "Kicks(2016)", "FreeStateofJones(2016)", "SupermanIV-TheQuestforPeace(1987)", "TheRoses(2025)", "EscapeRoom(2017)", "Antlers(2021)", "TheBatman(2022)", "HarryPotterandtheHalf-BloodPrince(2009)", "TheHatefulEight(2015)", "TheDeadDon'tDie(2019)", "BlackSwan(2010)", "ThePursuitofHappyness(2006)", "TheAssistant(2020)", "BacktothePast(2025)", "Irresistible(2020)", "Detroit(2017)", "SGT.WillGardner(2019)", "Renfield(2023)", "UpstreamColor(2013)", "Gogol.ATerribleVengeance(2018)", "TheBeekeeper(2024)", "Ambulance(2022)", "ConantheDestroyer(1984)", "Pitbull(2018)", "BatmanBegins(2005)", "GoinginStyle(2017)", "The.Man.with.the.Golden.Gun.1974", "WestSideStory(2021)", "TheHungerGames-CatchingFire(2013)", "InglouriousBasterds(2009)", "ThePerksofBeingaWallflower(2012)", "TheGreatestShowman(2017)", "21Bridges(2019)", "X-Men-DaysofFuturePast(2014)", "EscapePlan-TheExtractors(2019)", "StarshipTroopers-TraitorofMars(2017)", "TraumaCenter(2019)", "HouseofHummingbird(2019)", "SiliconCowboys(2016)", "AQuestionofFaith(2017)", "TheBossBaby(2017)", "ExMachina(2015)", "DiaryofaWimpyKid-TheLongHaul(2017)", "Incarnate(2016)", "The.Lord.of.the.Rings.The.Fellowship.of.the.Ring.(2001)", "Sleepless(2017)", "TRON-Ares(2025)", "Us(2019)", "Tomorrow.Never.Dies.1997", "TheMountainBetweenUs(2017)", "PercyJackson-SeaofMonsters(2013)", "Damsel(2024)", "ABurningHotSummer(2011)", "TheShadowEffect(2017)", "ThePlaguesofBreslau(2018)", "Crawl(2019)", "Split(2017)", "AQuietPlacePartII(2021)", "Daddy'sHome2(2017)", "TheBrothersGrimm(2005)", "Liverleaf(2018)", "TheAddamsFamily2(2021)", "Popstar-NeverStopNeverStopping(2016)", "Nobody(2021)", "BleedforThis(2016)", "TheShack(2017)", "Logan(2017)", "Pelé-BirthofaLegend(2016)", "TheGirlontheTrain(2016)", "BrawlinCellBlock99(2017)", "Replicas(2018)", "TheHotSpot(1990)", "CODA(2021)", "IndependenceDay-Resurgence(2016)", "TheWitches(2024)", "Triple9(2016)", "BadSeeds(2016)", "ProfessorMarstonandtheWonderWomen(2017)", "I'mStillHere(2024)", "JurassicWorld(2015)", "OverDrive(2018)", "BlackSite(2022)", "IntotheDeep(2022)", "EscapePlan(2013)", "TheNorthman(2022)", "SheHateMe(2004)", "TheBFG(2016)", "Wicked-ForGood(2025)", "Misconduct(2016)", "LittleMen(2016)", "Embattled(2020)", "Terminator-DarkFate(2019)", "TheUnbearableWeightofMassiveTalent(2022)", "FunnyFace(2021)", "HarryPotterandtheChamberofSecrets(2002)", "Gwen(2018)", "Harry.Potter.and.the.Deathly.Hallows.Part.1.(2010)", "Schindler'sList(1993)", "DangerousAnimals(2025)", "Little(2019)", "District9(2009)", "Holidays(2016)", "InDubiousBattle(2016)", "Avatar-TheWayofWater(2022)", "GoodNews(2025)", "TheIncredibleHulk(2008)", "WarMachine(2026)", "TheDrowning(2016)", "HellontheBorder(2019)", "BeforeIFall(2017)", "TheChroniclesofRiddick-Remastered(2004)", "Blackbird(2019)", "Bombshell-TheHedyLamarrStory(2018)", "TheVeil(2016)", "Spider-Man-NoWayHome(2021)", "BrigsbyBear(2017)", "TheHunt(2020)", "DoitforDad(2012)", "BlackAdam(2022)", "Checkmate(2025)", "BladeRunner-BlackOut2022(2017)", "Orphan-FirstKill(2022)", "TheHouse(2017)", "AFamilyMan(2016)", "TheWaterMan(2020)", "Wilson(2017)", "NoManofGod(2021)", "BenHur(2003)", "Germinal(1993)", "Wonderstruck(2017)", "Mojin-TheWormValley(2018)", "Gladiator(2000)", "PlayingwithFire(2019)", "Snowpiercer(2013)", "Open24Hours(2018)", "MidnightintheSwitchgrass(2021)", "Oppenheimer(2023)", "LondonHasFallen(2016)"];
+const STORAGE_KEY = 'ffdb_v2';
+let DB = {};
+let buildQueue = [];
+
+function saveDB() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); } catch(e) {}
+}
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { DB = JSON.parse(raw); return true; }
+  } catch(e) {}
+  return false;
+}
+function updateDBCount() {
+  document.getElementById('dbcount').textContent = Object.keys(DB).length;
+}
+function updateStats() {
+  var s=0, c=0, a=0;
+  Object.values(DB).forEach(function(v) {
+    if(v.r==='safe') s++;
+    else if(v.r==='caution') c++;
+    else if(v.r==='avoid') a++;
+  });
+  document.getElementById('sc').textContent = s;
+  document.getElementById('wc').textContent = c;
+  document.getElementById('ac').textContent = a;
+}
+
+window.addEventListener('load', function() {
+  loadDB();
+  updateDBCount();
+  var saved = Object.keys(DB).length;
+  if (saved > 0) {
+    var resumeBtn = document.getElementById('resumeBtn');
+    resumeBtn.style.display = 'inline-block';
+    resumeBtn.textContent = 'استكمال (' + (MOVIES.length - saved) + ' متبقي)';
+    if (saved >= MOVIES.length) { skipSetup(); return; }
+  }
+  updateStats();
+});
+
+function skipSetup() {
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('hstatus').textContent = Object.keys(DB).length + ' فيلم محلل';
+  updateStats();
+}
+function goSetup() {
+  document.getElementById('setupScreen').style.display = 'block';
+  document.getElementById('appScreen').style.display = 'none';
+}
+
+async function startBuild() {
+  buildQueue = MOVIES.filter(function(m) { return !DB[m]; });
+  if (!buildQueue.length) { skipSetup(); return; }
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('resumeBtn').style.display = 'none';
+  await runBuild();
+}
+async function resumeBuild() {
+  buildQueue = MOVIES.filter(function(m) { return !DB[m]; });
+  document.getElementById('resumeBtn').disabled = true;
+  await runBuild();
+}
+
+async function runBuild() {
+  var total = MOVIES.length;
+  var log = document.getElementById('log');
+  for (var i = 0; i < buildQueue.length; i++) {
+    var movie = buildQueue[i];
+    var done = (total - buildQueue.length) + i + 1;
+    var pct = Math.round((done / total) * 100);
+    document.getElementById('pbar').style.width = pct + '%';
+    document.getElementById('ptext').textContent = done + ' / ' + total + ' (' + pct + '%)';
+    document.getElementById('hstatus').textContent = 'جاري البناء ' + pct + '%';
+    try {
+      var resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 250,
+          system: 'Reply with JSON only, no extra text: {"r":"safe|caution|avoid","n":"none|mild|strong","v":"none|mild|strong","l":"none|mild|strong","t":"none|mild|strong","s":"short Arabic summary","vd":"short Arabic verdict"}',
+          messages: [{ role: 'user', content: 'Rate for family viewing: ' + movie }]
+        })
+      });
+      var data = await resp.json();
+      var text = data.content[0].text.replace(/```json|```/g, '').trim();
+      var info = JSON.parse(text);
+      DB[movie] = info;
+      saveDB();
+      updateDBCount();
+      var icons = { safe: '✅', caution: '⚠️', avoid: '🚫' };
+      var entry = document.createElement('div');
+      entry.className = info.r === 'safe' ? 'lok' : info.r === 'caution' ? 'lwarn' : 'lbad';
+      entry.textContent = (icons[info.r] || '?') + ' ' + movie;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    } catch(e) {
+      var entry2 = document.createElement('div');
+      entry2.textContent = 'skip: ' + movie;
+      log.appendChild(entry2);
+      log.scrollTop = log.scrollHeight;
+      await new Promise(function(r) { setTimeout(r, 3000); });
+    }
+    await new Promise(function(r) { setTimeout(r, 350); });
+  }
+  document.getElementById('ptext').textContent = 'اكتمل! ' + Object.keys(DB).length + ' فيلم';
+  updateStats();
+  setTimeout(skipSetup, 1500);
+}
+
+// Search
+var inp = document.getElementById('inp');
+var sugg = document.getElementById('sugg');
+var hist = [];
+
+inp.addEventListener('input', function() {
+  var q = inp.value.trim().toLowerCase();
+  if (q.length < 2) { sugg.classList.remove('show'); return; }
+  var matches = MOVIES.filter(function(x) { return x.toLowerCase().includes(q); }).slice(0, 8);
+  if (!matches.length) { sugg.classList.remove('show'); return; }
+  sugg.innerHTML = matches.map(function(x) {
+    var info = DB[x];
+    var icon = info ? (info.r === 'safe' ? '✅' : info.r === 'caution' ? '⚠️' : '🚫') : '🎬';
+    return '<div class="si" data-name="' + x.replace(/"/g, '&quot;') + '" onclick="selMovie(this.dataset.name)">' + icon + ' ' + x + '</div>';
+  }).join('');
+  sugg.classList.add('show');
+});
+inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') checkSingle(); });
+document.addEventListener('click', function(e) { if (!e.target.closest('.sbox')) sugg.classList.remove('show'); });
+
+function selMovie(n) { inp.value = n; sugg.classList.remove('show'); checkSingle(); }
+
+function sw(btn, tab) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('on'); });
+  document.querySelectorAll('.tc').forEach(function(t) { t.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById(tab).classList.add('on');
+}
+
+function checkSingle(name) {
+  var mn = name || inp.value.trim();
+  if (!mn) return;
+  sugg.classList.remove('show');
+  var info = DB[mn];
+  if (!info) {
+    var key = Object.keys(DB).find(function(k) {
+      return k.toLowerCase().replace(/[^a-z0-9]/g,'').includes(mn.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10));
+    });
+    if (key) info = DB[key];
+  }
+  if (info) {
+    addHist(mn, info.r);
+    showResult(info, mn);
+  } else {
+    document.getElementById('res').innerHTML = '<div style="background:var(--surface);border-radius:8px;padding:14px;font-size:13px;color:var(--muted);border:1px solid var(--border)">❓ لم يُحلَّل هذا الفيلم بعد. اضغط "إعادة بناء" لتحليل كل الأفلام.</div>';
+  }
+}
+
+function showResult(info, title) {
+  var rm = {
+    safe: { l: '✅ مناسب للعائلة', c: 'rs', i: '✅', v: 'vrs' },
+    caution: { l: '⚠️ تحذير', c: 'rc', i: '⚠️', v: 'vrc' },
+    avoid: { l: '🚫 غير مناسب', c: 'ra', i: '🚫', v: 'vra' }
+  };
+  var cl = { n: '👗 مشاهد عارية', v: '⚔️ عنف', l: '🗣️ ألفاظ', t: '🎭 مواضيع' };
+  var cc = { none: 'cn', mild: 'cm', strong: 'cs' };
+  var ct = { none: 'لا يوجد', mild: 'خفيف', strong: 'صريح' };
+  var r = rm[info.r] || rm.caution;
+  var cats = Object.entries(cl).map(function(e) {
+    var v = info[e[0]] || 'none';
+    return '<div class="cat ' + cc[v] + '">' + e[1] + '<span style="margin-right:auto">' + ct[v] + '</span></div>';
+  }).join('');
+  document.getElementById('res').innerHTML =
+    '<div class="rcard"><div class="rheader">' +
+    '<div class="rico">' + r.i + '</div>' +
+    '<div><div class="rtitle">' + title + '</div></div>' +
+    '<div class="rbadge ' + r.c + '">' + r.l + '</div></div>' +
+    '<div class="cats">' + cats + '</div>' +
+    '<div class="sumbox">📝 ' + info.s + '</div>' +
+    '<div class="verd ' + r.v + '">💬 ' + info.vd + '</div></div>';
+}
+
+function addHist(name, rating) {
+  if (hist.find(function(h) { return h.n === name; })) return;
+  hist.unshift({ n: name, r: rating });
+  if (hist.length > 16) hist.pop();
+  renderHist();
+}
+function renderHist() {
+  if (!hist.length) return;
+  document.getElementById('hist').style.display = 'block';
+  var cm = { safe: 'hs', caution: 'hc', avoid: 'ha' };
+  var im = { safe: '✅', caution: '⚠️', avoid: '🚫' };
+  document.getElementById('hgrid').innerHTML = hist.map(function(h) {
+    return '<div class="hi ' + cm[h.r] + '" data-n="' + h.n.replace(/"/g,'&quot;') + '" onclick="inp.value=this.dataset.n;checkSingle()">' + im[h.r] + ' <span style="overflow:hidden;text-overflow:ellipsis">' + h.n + '</span></div>';
+  }).join('');
+}
+
+function doBatch() {
+  var lines = document.getElementById('batch').value.trim().split('\n').filter(function(l) { return l.trim(); });
+  if (!lines.length) return;
+  var icons = { safe: '✅', caution: '⚠️', avoid: '🚫' };
+  var colors = { safe: '#34d399', caution: '#fb923c', avoid: '#f87171' };
+  var html = '';
+  lines.forEach(function(line) {
+    var name = line.trim();
+    var info = DB[name];
+    if (info) {
+      html += '<div class="brow" style="border-right-color:' + colors[info.r] + '" data-n="' + name.replace(/"/g,'&quot;') + '" onclick="selSingle(this.dataset.n)">' +
+        '<span style="font-size:18px">' + icons[info.r] + '</span>' +
+        '<span style="flex:1;font-weight:600">' + name + '</span>' +
+        '<span style="font-size:12px;color:' + colors[info.r] + '">' + info.vd.slice(0,35) + '</span></div>';
+      addHist(name, info.r);
+    } else {
+      html += '<div class="brow"><span style="font-size:18px">❓</span><span style="flex:1;font-weight:600">' + name + '</span><span style="font-size:12px;color:var(--muted)">لم يُحلَّل بعد</span></div>';
+    }
+  });
+  document.getElementById('bres').innerHTML = html;
+}
+
+function selSingle(name) {
+  inp.value = name;
+  sw(document.getElementById('tb1'), 't1');
+  checkSingle();
+}
+
+function addSample() {
+  document.getElementById('batch').value = MOVIES.slice(0, 12).join('\n');
+}
+
+function filterLib(filter) {
+  var icons = { safe: '✅', caution: '⚠️', avoid: '🚫' };
+  var colors = { safe: '#34d399', caution: '#fb923c', avoid: '#f87171' };
+  var entries = MOVIES.filter(function(m) {
+    if (!DB[m]) return false;
+    return filter === 'all' || DB[m].r === filter;
+  });
+  if (!entries.length) {
+    document.getElementById('liblist').innerHTML = '<div style="color:var(--muted);font-size:13px;padding:12px">لا توجد نتائج - ابن قاعدة البيانات أولاً</div>';
+    return;
+  }
+  var html = '';
+  entries.forEach(function(m) {
+    var info = DB[m];
+    html += '<div class="brow" style="border-right-color:' + colors[info.r] + '" data-n="' + m.replace(/"/g,'&quot;') + '" onclick="selSingle(this.dataset.n)">' +
+      '<span style="font-size:16px">' + icons[info.r] + '</span>' +
+      '<span style="flex:1;font-size:13px;font-weight:600">' + m + '</span>' +
+      '<span style="font-size:11px;color:' + colors[info.r] + '">' + info.vd.slice(0,30) + '</span></div>';
+  });
+  document.getElementById('liblist').innerHTML = html;
+}
+
+function exportCSV() {
+  var map = { safe: 'مناسب', caution: 'تحذير', avoid: 'غير مناسب' };
+  var lv = { none: 'لا يوجد', mild: 'خفيف', strong: 'صريح' };
+  var csv = 'الفيلم,التصنيف,مشاهد عارية,عنف,الفاظ,مواضيع,الملاحظات\n';
+  MOVIES.forEach(function(m) {
+    var i = DB[m];
+    if (i) csv += '"' + m + '","' + (map[i.r]||'') + '","' + (lv[i.n]||'') + '","' + (lv[i.v]||'') + '","' + (lv[i.l]||'') + '","' + (lv[i.t]||'') + '","' + (i.vd||'') + '"\n';
+  });
+  var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'تقرير_الافلام.csv';
+  a.click();
+}
+</script>
+</body>
+</html>
